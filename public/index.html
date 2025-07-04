@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сократи ссылку</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Кликер Кликер</h1>
+  <p>
+    Помогите людям быстро найти вашу страницу в интернете. Благодаря короткой ссылке
+    людям не придётся видеть длинные url-адреса, занимающие много места.
+  </p>
+  <form class="form-container" id="shorten-form">
+    <input type="text" id="link" name="link" placeholder="Вставьте длинную ссылку">
+    <button type="submit">Сократить</button>
+  </form>
+
+  <div class="result" id="result" style="display:none;">
+    <span id="short-link"></span>
+    <button class="copy-btn" onclick="copyLink()" title="Скопировать">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    const form = document.getElementById('shorten-form')
+    const resultBlock = document.getElementById('result')
+    const shortLink = document.getElementById('short-link')
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const link = document.getElementById('link').value
+      if (!link) return
+
+      const formData = new FormData()
+      formData.append('link', link)
+
+      const res = await fetch('/short', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await res.json()
+      const full = `${window.location.origin}/${data.short}`
+      shortLink.textContent = full
+      resultBlock.style.display = 'flex'
+    })
+
+    function copyLink() {
+      const text = shortLink.textContent
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Ссылка скопирована!')
+      })
+    }
+  </script>
+</body>
+</html>
